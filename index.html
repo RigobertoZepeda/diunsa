@@ -213,7 +213,7 @@ body.dark .imgbox{background:linear-gradient(145deg,#1B3354,#102038)}
     <div class="field"><label for="bDel">Tipo de entrega</label><select id="bDel"><option>Envío a domicilio</option><option>Retiro en tienda (por coordinar)</option></select></div>
     <div class="field"><label for="bNotes">Indicaciones (opcional)</label><input id="bNotes" maxlength="180" placeholder="Horario o referencia"></div>
   </div>
-  <div class="warn"><b>Importante:</b> esto es una simulación académica. Al enviar, se abrirá WhatsApp o tu app de correo con el pedido ya redactado para que lo revises y lo envíes. El equipo confirmará disponibilidad, costo de envío y forma de pago. No se procesan pagos en este sitio. Tus datos se usan solo para contactarte sobre este pedido.</div>
+  <div class="warn"><b>Importante:</b> esto es una simulación académica. WhatsApp abre un chat con el pedido ya redactado para que lo envíes; el correo se envía directamente al equipo (si falla, se abre Gmail con el pedido listo). El equipo confirmará disponibilidad, costo de envío y forma de pago. No se procesan pagos en este sitio. Tus datos se usan solo para contactarte sobre este pedido.</div>
   <div class="chbtns"><button class="btn btn-wa" type="button" id="sendWa">Enviar por WhatsApp ↗</button><button class="btn btn-bl" type="button" id="sendMail">Enviar por correo ✉</button></div>
   <div class="small"><button class="btn btn-line" type="button" id="copyOrder">Copiar resumen</button><button class="btn btn-line" type="button" id="backCart">Volver a mi selección</button></div></form>
 </div></div>
@@ -229,8 +229,10 @@ body.dark .imgbox{background:linear-gradient(145deg,#1B3354,#102038)}
 <script>
 "use strict";
 const WHATSAPP_NUMBER="50489404612", CONTACT_EMAIL="rigozepeda2014@gmail.com";
-/* Fotos reales: coloca archivos en la carpeta img/ con el nombre del campo "slug" (ej. img/tv.jpg). Si no existen, se muestra la ilustración. */
+/* Fotos reales: (a) coloca archivos en la carpeta img/ con el nombre del campo "slug" (ej. img/tv.jpg), o (b) agrega a un producto el campo photo:"https://..." con el enlace directo a la imagen. Si la imagen no carga, se muestra la ilustración. */
 const PHOTO_DIR="img/", PHOTO_EXT=".jpg";
+const USE_ONLINE_PHOTOS=true; /* si no hay foto local, usa fotos reales en línea (LoremFlickr, por palabra clave) */
+const FLICKR={tv:"television",fridge:"refrigerator",washer:"washing,machine",micro:"microwave",blender:"blender",fan:"electric,fan",phone:"smartphone",laptop:"laptop",head:"headphones",sofa:"sofa",bed:"mattress,bedroom",coffee:"coffee,machine",pad:"gamepad",bike:"bicycle",speaker:"bluetooth,speaker",desk:"desk,office"};
 const ILL={
 tv:'<rect x="25" y="45" width="150" height="95" rx="8" fill="#1D2733"/><rect x="32" y="52" width="136" height="81" rx="4" fill="#0A6FD2"/><path d="M32 120L80 85l30 23 25-18 33 28v15H32z" fill="#7CC1F0" opacity=".75"/><circle cx="140" cy="72" r="9" fill="#FFC83D"/><rect x="85" y="140" width="30" height="14" fill="#94A3B8"/><rect x="65" y="152" width="70" height="8" rx="4" fill="#64748B"/>',
 fridge:'<rect x="55" y="18" width="90" height="164" rx="10" fill="#E2E8F0" stroke="#94A3B8" stroke-width="3"/><path d="M55 78h90" stroke="#94A3B8" stroke-width="3"/><rect x="127" y="38" width="6" height="28" rx="3" fill="#64748B"/><rect x="127" y="94" width="6" height="42" rx="3" fill="#64748B"/><rect x="70" y="30" width="40" height="6" rx="3" fill="#BFE0F7"/><circle cx="80" cy="120" r="10" fill="#BFE0F7"/>',
@@ -250,7 +252,10 @@ speaker:'<rect x="55" y="28" width="90" height="144" rx="22" fill="#1D2733"/><ci
 desk:'<rect x="22" y="100" width="156" height="14" rx="4" fill="#C28A55"/><rect x="32" y="114" width="10" height="62" fill="#7C5430"/><rect x="158" y="114" width="10" height="62" fill="#7C5430"/><rect x="118" y="114" width="40" height="46" rx="3" fill="#A97440"/><rect x="126" y="124" width="24" height="8" rx="2" fill="#7C5430"/><rect x="126" y="142" width="24" height="8" rx="2" fill="#7C5430"/><rect x="50" y="42" width="70" height="48" rx="4" fill="#1D2733"/><rect x="56" y="48" width="58" height="36" rx="2" fill="#0A6FD2"/><rect x="80" y="90" width="10" height="10" fill="#64748B"/><rect x="132" y="86" width="22" height="14" rx="3" fill="#E8651A"/>'
 };
 const svg=k=>`<svg viewBox="0 0 200 200" role="img" aria-label="${k}">${ILL[k]}</svg>`;
-function imgFail(el){ el.outerHTML=svg(el.dataset.key); }
+function imgFail(el){
+  if(USE_ONLINE_PHOTOS&&!el.dataset.step){el.dataset.step="1";el.src="https://loremflickr.com/800/800/"+FLICKR[el.dataset.key]+"?lock="+el.dataset.id;return}
+  el.outerHTML=svg(el.dataset.key);
+}
 window.imgFail=imgFail;
 const products=[
 {id:1,n:'Televisor Smart TV 55 pulgadas',b:'VisionPlus',c:'Electrónica',p:12499,o:13999,k:'tv',slug:'tv',d:'Televisor de pantalla amplia para entretenimiento en el hogar.',s:['Pantalla de 55 pulgadas','Smart TV con aplicaciones','Entradas HDMI y USB']},
@@ -276,7 +281,7 @@ const LENS='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="
 const CART='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.4 11h10l2-8H6.2"/><circle cx="9" cy="19" r="1.6"/><circle cx="17" cy="19" r="1.6"/></svg>';
 const $=id=>document.getElementById(id);
 const money=n=>"L. "+new Intl.NumberFormat("es-HN",{minimumFractionDigits:2,maximumFractionDigits:2}).format(n);
-const vis=p=>`<img src="${PHOTO_DIR+p.slug+PHOTO_EXT}" alt="${p.n}" loading="lazy" data-key="${p.k}" onerror="imgFail(this)">`;
+const vis=p=>`<img src="${p.photo||(PHOTO_DIR+p.slug+PHOTO_EXT)}" alt="${p.n}" loading="lazy" data-key="${p.k}" data-id="${p.id}" onerror="imgFail(this)">`;
 let category="Todo",query="",selection=[],favs=[],toastTimer,maxPrice=0;
 function load(key){try{const v=JSON.parse(localStorage.getItem(key)||"[]");return Array.isArray(v)?v:[]}catch(e){return[]}}
 function store(key,v){try{localStorage.setItem(key,JSON.stringify(v))}catch(e){}}
@@ -370,7 +375,22 @@ function buildMessage(d){
 }
 function finish(){selection=[];store("diunsa-sim-selection",selection);updateCount();renderSelection();$("checkoutForm").reset();hideL("checkoutModal")}
 $("sendWa").onclick=()=>{const d=orderData();if(!d)return;const m=buildMessage(d);const url=`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(m.text)}`;const w=window.open(url,"_blank","noopener,noreferrer");if(!w)location.href=url;finish();toast("Se abrió WhatsApp con tu pedido. Envíalo para completarlo.")};
-$("sendMail").onclick=()=>{const d=orderData();if(!d)return;const m=buildMessage(d);location.href=`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Pedido "+m.id+" (simulación académica)")}&body=${encodeURIComponent(m.text)}`;finish();toast("Se abrió tu correo con el pedido. Envíalo para completarlo.")};
+$("sendMail").onclick=async()=>{
+  const d=orderData();if(!d)return;const m=buildMessage(d),btn=$("sendMail"),old=btn.textContent;
+  btn.disabled=true;btn.textContent="Enviando…";
+  try{
+    const payload={_subject:"Nuevo pedido "+m.id+" (simulación académica)",_template:"box",_captcha:"false",pedido:m.id,nombre:d.name,telefono:d.phone,ciudad:d.city,direccion:d.address,entrega:d.delivery,indicaciones:d.notes||"-",detalle:m.text};
+    if(d.email)payload.email=d.email;
+    const r=await fetch("https://formsubmit.co/ajax/"+CONTACT_EMAIL,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify(payload)});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok||String(j.success)==="false")throw new Error(j.message||"error");
+    finish();toast("¡Pedido enviado por correo! El equipo te contactará pronto.");
+  }catch(err){
+    const url="https://mail.google.com/mail/?view=cm&fs=1&to="+encodeURIComponent(CONTACT_EMAIL)+"&su="+encodeURIComponent("Pedido "+m.id+" (simulación académica)")+"&body="+encodeURIComponent(m.text);
+    window.open(url,"_blank","noopener,noreferrer");
+    toast("No se pudo enviar automáticamente. Se abrió Gmail con tu pedido: presiona Enviar.");
+  }finally{btn.disabled=false;btn.textContent=old}
+};
 $("copyOrder").onclick=async()=>{const d=orderData();if(!d)return;try{await navigator.clipboard.writeText(buildMessage(d).text);toast("Resumen copiado. Pégalo en WhatsApp o correo.")}catch(e){toast("No se pudo copiar automáticamente. Usa los botones de envío.")}};
 $("backCart").onclick=()=>{hideL("checkoutModal");showL("drawer")};
 
