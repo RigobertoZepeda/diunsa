@@ -7,7 +7,7 @@
 <meta name="description" content="Simulación académica de tienda en línea inspirada en DIUNSA: catálogo, zoom de imágenes, favoritos y pedido por WhatsApp o correo.">
 <title>Diunsa | Lo mejor para comprar (simulación académica)</title>
 <style>
-:root{--azul:#0A6FD2;--azul2:#0A4C8C;--navy:#12335E;--naranja:#E8651A;--naranja2:#C9540F;--amarillo:#FFC83D;--fondo:#F6F9FD;--card:#fff;--texto:#1D2733;--muted:#66758A;--line:#E0E8F2;--pill:#E8F2FB;--pillon:#E5E0FF;--pilltxt:#0A4C8C;--wa:#1FA855;--shadow:0 6px 22px #0a3f7a14}
+:root{--azul:#0A6FD2;--azul2:#0A4C8C;--navy:#12335E;--naranja:#E8651A;--naranja2:#C9540F;--amarillo:#FFC83D;--fondo:#FFFFFF;--card:#fff;--texto:#1D2733;--muted:#66758A;--line:#E0E8F2;--pill:#E8F2FB;--pillon:#E5E0FF;--pilltxt:#0A4C8C;--wa:#1FA855;--shadow:0 6px 22px #0a3f7a14}
 body.dark{--fondo:#0D1829;--card:#15253B;--texto:#E8EEF7;--muted:#9FB0C6;--line:#263A57;--pill:#1B3354;--pillon:#3A3475;--pilltxt:#CFE3FA;--navy:#0B2342;--shadow:0 6px 22px #0006}
 *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:160px}
 body{margin:0;font-family:"Segoe UI",Poppins,Arial,sans-serif;background:var(--fondo);color:var(--texto);line-height:1.5;transition:background .25s,color .25s}
@@ -57,8 +57,9 @@ main{max-width:1280px;margin:auto;padding:20px}
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
 .product{background:var(--card);border-radius:24px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;border:1px solid var(--line);transition:transform .2s}
 .product:hover{transform:translateY(-3px)}
-.imgbox{position:relative;height:230px;background:linear-gradient(145deg,#F4F9FF,#E4EFFA);overflow:hidden;cursor:zoom-in;display:grid;place-items:center}
+.imgbox{position:relative;height:230px;background:radial-gradient(circle at 50% 58%,#E6F1FC 0,#F7FAFE 46%,#FFFFFF 78%);overflow:hidden;cursor:zoom-in;display:grid;place-items:center}
 body.dark .imgbox{background:linear-gradient(145deg,#1B3354,#102038)}
+.vis svg{filter:drop-shadow(0 10px 10px rgba(10,60,120,.20))}
 .vis{width:78%;height:78%;transition:transform .25s;display:grid;place-items:center}.vis svg,.vis img{width:100%;height:100%;object-fit:contain}
 @media(hover:hover){.imgbox:hover .vis{transform:scale(1.3)}}
 .tag{position:absolute;top:12px;left:12px;background:var(--naranja);color:#fff;font-size:11px;font-weight:800;padding:4px 9px;border-radius:20px;z-index:2}
@@ -122,6 +123,9 @@ body.dark .imgbox{background:linear-gradient(145deg,#1B3354,#102038)}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<filter id="dsBevel" filterUnits="userSpaceOnUse" x="0" y="0" width="200" height="200" color-interpolation-filters="sRGB"><feGaussianBlur in="SourceAlpha" stdDeviation="2.4" result="b"/><feSpecularLighting in="b" surfaceScale="5" specularConstant=".7" specularExponent="24" lighting-color="#ffffff" result="sp"><fePointLight x="30" y="5" z="170"/></feSpecularLighting><feComposite in="sp" in2="SourceAlpha" operator="in" result="sp2"/><feComposite in="SourceGraphic" in2="sp2" operator="arithmetic" k1="0" k2="1" k3=".75" k4="0"/></filter>
+</defs></svg>
 <div class="top">SIMULACIÓN ACADÉMICA · Proyecto de Comercio Electrónico, UTH · No es el sitio oficial de DIUNSA · Precios referenciales</div>
 <header class="header"><div class="wrap">
   <div class="headrow">
@@ -231,7 +235,9 @@ body.dark .imgbox{background:linear-gradient(145deg,#1B3354,#102038)}
 const WHATSAPP_NUMBER="50489404612", CONTACT_EMAIL="rigozepeda2014@gmail.com";
 /* Fotos reales: (a) coloca archivos en la carpeta img/ con el nombre del campo "slug" (ej. img/tv.jpg), o (b) agrega a un producto el campo photo:"https://..." con el enlace directo a la imagen. Si la imagen no carga, se muestra la ilustración. */
 const PHOTO_DIR="img/", PHOTO_EXT=".jpg";
-const USE_ONLINE_PHOTOS=true; /* si no hay foto local, usa fotos reales en línea (LoremFlickr, por palabra clave) */
+const USE_ONLINE_PHOTOS=false; /* si no hay foto local, usa fotos reales en línea (LoremFlickr, por palabra clave) */
+/* Pega aquí el enlace directo de una foto por producto (opcional). Ejemplo: tv:"https://.../televisor.jpg" */
+const PHOTOS={tv:"",fridge:"",washer:"",micro:"",blender:"",fan:"",phone:"",laptop:"",head:"",sofa:"",bed:"",coffee:"",pad:"",bike:"",speaker:"",desk:""};
 const FLICKR={tv:"television",fridge:"refrigerator",washer:"washing,machine",micro:"microwave",blender:"blender",fan:"electric,fan",phone:"smartphone",laptop:"laptop",head:"headphones",sofa:"sofa",bed:"mattress,bedroom",coffee:"coffee,machine",pad:"gamepad",bike:"bicycle",speaker:"bluetooth,speaker",desk:"desk,office"};
 const ILL={
 tv:'<rect x="25" y="45" width="150" height="95" rx="8" fill="#1D2733"/><rect x="32" y="52" width="136" height="81" rx="4" fill="#0A6FD2"/><path d="M32 120L80 85l30 23 25-18 33 28v15H32z" fill="#7CC1F0" opacity=".75"/><circle cx="140" cy="72" r="9" fill="#FFC83D"/><rect x="85" y="140" width="30" height="14" fill="#94A3B8"/><rect x="65" y="152" width="70" height="8" rx="4" fill="#64748B"/>',
@@ -251,7 +257,7 @@ bike:'<circle cx="52" cy="128" r="35" fill="none" stroke="#1D2733" stroke-width=
 speaker:'<rect x="55" y="28" width="90" height="144" rx="22" fill="#1D2733"/><circle cx="100" cy="72" r="22" fill="#334155" stroke="#7CC1F0" stroke-width="4"/><circle cx="100" cy="72" r="8" fill="#7CC1F0"/><circle cx="100" cy="128" r="28" fill="#334155" stroke="#0A6FD2" stroke-width="5"/><circle cx="100" cy="128" r="12" fill="#0A6FD2"/><circle cx="100" cy="44" r="3" fill="#E8651A"/>',
 desk:'<rect x="22" y="100" width="156" height="14" rx="4" fill="#C28A55"/><rect x="32" y="114" width="10" height="62" fill="#7C5430"/><rect x="158" y="114" width="10" height="62" fill="#7C5430"/><rect x="118" y="114" width="40" height="46" rx="3" fill="#A97440"/><rect x="126" y="124" width="24" height="8" rx="2" fill="#7C5430"/><rect x="126" y="142" width="24" height="8" rx="2" fill="#7C5430"/><rect x="50" y="42" width="70" height="48" rx="4" fill="#1D2733"/><rect x="56" y="48" width="58" height="36" rx="2" fill="#0A6FD2"/><rect x="80" y="90" width="10" height="10" fill="#64748B"/><rect x="132" y="86" width="22" height="14" rx="3" fill="#E8651A"/>'
 };
-const svg=k=>`<svg viewBox="0 0 200 200" role="img" aria-label="${k}">${ILL[k]}</svg>`;
+const svg=k=>`<svg viewBox="0 0 200 200" role="img" aria-label="${k}"><ellipse cx="100" cy="187" rx="64" ry="7" fill="#0A3F7A" opacity=".16"/><g filter="url(#dsBevel)">${ILL[k]}</g></svg>`;
 function imgFail(el){
   if(USE_ONLINE_PHOTOS&&!el.dataset.step){el.dataset.step="1";el.src="https://loremflickr.com/800/800/"+FLICKR[el.dataset.key]+"?lock="+el.dataset.id;return}
   el.outerHTML=svg(el.dataset.key);
@@ -281,7 +287,7 @@ const LENS='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="
 const CART='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.4 11h10l2-8H6.2"/><circle cx="9" cy="19" r="1.6"/><circle cx="17" cy="19" r="1.6"/></svg>';
 const $=id=>document.getElementById(id);
 const money=n=>"L. "+new Intl.NumberFormat("es-HN",{minimumFractionDigits:2,maximumFractionDigits:2}).format(n);
-const vis=p=>`<img src="${p.photo||(PHOTO_DIR+p.slug+PHOTO_EXT)}" alt="${p.n}" loading="lazy" data-key="${p.k}" data-id="${p.id}" onerror="imgFail(this)">`;
+const vis=p=>`<img src="${PHOTOS[p.k]||p.photo||(PHOTO_DIR+p.slug+PHOTO_EXT)}" alt="${p.n}" loading="lazy" data-key="${p.k}" data-id="${p.id}" onerror="imgFail(this)">`;
 let category="Todo",query="",selection=[],favs=[],toastTimer,maxPrice=0;
 function load(key){try{const v=JSON.parse(localStorage.getItem(key)||"[]");return Array.isArray(v)?v:[]}catch(e){return[]}}
 function store(key,v){try{localStorage.setItem(key,JSON.stringify(v))}catch(e){}}
